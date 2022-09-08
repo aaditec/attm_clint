@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">ATM</string>
+    <string name="audio_is_playing">Audio is playing</string>
+    <string name="status">Status</string>
+    <string name="cancel">Cancel</string>
+    <string name="newDeviceRegistration">New Device Registration</string>
+    <string name="hint_new_device_reg_name">Enter Device Name</string>
+    <string name="ok">Ok</string>
+
+</resources>
