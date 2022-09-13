@@ -5,9 +5,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".start">
+    tools:context=".StartActivity">
     <EditText
-        android:id="@+id/regDevice"
+        android:id="@+id/edtDeviceName"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:layout_marginTop="40dp"
@@ -21,7 +21,7 @@
         />
 
     <Button
-        android:id="@+id/proceed"
+        android:id="@+id/btnRegistration"
         android:layout_below="@+id/regDevice"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

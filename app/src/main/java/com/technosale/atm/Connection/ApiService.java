@@ -14,8 +14,4 @@ public interface ApiService {
 
     @GET(Constants.ADD_DEVICE)
     Call<AudioResponseModel> registerDevices (@Query("device_name") String device_name);
-
-
-
-//    Call<String> uploadVideo (@Query("device_name") String device_name);
 }

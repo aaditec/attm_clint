@@ -1,13 +1,11 @@
 package com.technosale.atm;
 
-import static android.content.ContentValues.TAG;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.util.Base64;
-import android.util.Log;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import com.technosale.atm.Connection.API;
@@ -22,7 +20,6 @@ import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
     private MediaPlayer mPlayer;
-    private static final String LOG_TAG = "AudioRecording";
     private static String mFileName = null;
     Timer initTimer = new Timer();
     Timer secondTimer = new Timer();
@@ -34,15 +31,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // getting bundle from recyclerview adapter
         Bundle bundle = getIntent().getExtras();
         String title = bundle.getString("device_name");
-        System.out.println("pass gareko bundle ko value" + title);
         startFirstTimer(title);
     }
 
     private void startFirstTimer(String title) {
-        System.out.println("first timer started");
         initTimer = new Timer();
         initTimer.scheduleAtFixedRate(new TimerTask() {
             public void run() {
@@ -56,24 +50,15 @@ public class MainActivity extends AppCompatActivity {
         call.enqueue(new Callback<AudioResponseModel>() {
             @Override
             public void onResponse(Call<AudioResponseModel> call, Response<AudioResponseModel> response) {
-                System.out.println("response code is" + response.code());
-                System.out.println("response is " + response.body());
                 if (response.code() == 200) {
                     if (response.body() != null) {
-                        System.out.println("is not null");
                         AudioResponseModel responseModel = response.body();
-                        System.out.println("audio received ko value " + audioReceived);
-
-                        /*200 + audio file received from server*/
                         if (!responseModel.audio_base64_text.equals("")){
-                            System.out.println("else ma aayo");
                             audioReceived = true;
                             hitTime = 0;
-                            System.out.println("hit time ko value" + hitTime);
                             String base64Audio = responseModel.audio_base64_text;
                             File dir = Environment.getExternalStorageDirectory();
                             File target = new File(dir, "Audio captures");
-                            System.out.println("target location is " + target.getAbsolutePath().toString());
                             if (!target.exists())
                                 target.mkdirs();
                             mPlayer = new MediaPlayer();
@@ -91,43 +76,33 @@ public class MainActivity extends AppCompatActivity {
                                     File[] files = target.listFiles();
                                     if (files.length > 0) {
                                         File uploadFile = new File(target, files[0].getName());
-                                        System.out.println("upload file is " + uploadFile);
                                         Uri uri = Uri.fromFile(uploadFile);
                                         uploadFile = new File(uri.getPath());
                                         File finalUploadFile = uploadFile;
                                         if (response.code() == 200) {
                                             finalUploadFile.delete();
-                                            Log.i(TAG, "decoded file deleted: " + finalUploadFile);
                                         }
                                     }
                                 } catch (Exception e) {
-                                    Log.e(LOG_TAG, "prepare() failed");
                                 }
                             } catch (Exception e) {
-                                Log.e(LOG_TAG, "prepare() failed");
                             }
-                            stopFirstTimer("from 200 + message");
+                            stopFirstTimer();
 
-                            /*Second timer initialised with delay of 10 sec*/
                             final Handler handler = new Handler();
                             handler.postDelayed(new Runnable() {
                                 @Override
                                 public void run() {
-                                    startSecondTimer(title, "from 200 + message");
+                                    startSecondTimer(title);
                                 }
                             }, 1000 * 10);
                         } else {
-                            /*response code is 200 but audio chaina*/
-                            /*Audio first time receive bhaye pachhi hit time ma jane ho*/
                             if (audioReceived) {
-                                System.out.println("audio empty");
                                 hitTime += 1;
-                                System.out.println("hit time" + hitTime);
                                 if (hitTime == 2) {
                                     audioReceived = false;
                                     hitTime = 0;
-                                    stopSecondTimer("khali audio");
-                                    /*Second timer initialised with delay of 10 sec*/
+                                    stopSecondTimer();
                                     final Handler handler = new Handler();
                                     handler.postDelayed(new Runnable() {
                                         @Override
@@ -140,34 +115,22 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 }
-                /*Response code 200 nabhayeko case
-                else {
-
-                }
-                */
-
             }
 
             @Override
             public void onFailure(Call<AudioResponseModel> call, Throwable t) {
-                System.out.println("failure ko case " + t.getMessage());
-                System.out.println("failure ko case " + t.getLocalizedMessage());
-
             }
         });
     }
 
-    private void stopSecondTimer(String msg) {
-        System.out.println("second timer stopped" + msg);
+    private void stopSecondTimer() {
         if (secondTimer != null) {
             secondTimer.cancel();
             secondTimer.purge();
         }
     }
 
-    /*10 sec Timer*/
-    private void startSecondTimer(String title, String msg) {
-        System.out.println("second timer started" + msg);
+    private void startSecondTimer(String title) {
         secondTimer = new Timer();
         secondTimer.scheduleAtFixedRate(new TimerTask() {
             public void run() {
@@ -176,8 +139,7 @@ public class MainActivity extends AppCompatActivity {
         }, 0, 1000 * 10);
     }
 
-    private void stopFirstTimer(String msg) {
-        System.out.println("first timer stopped" + msg);
+    private void stopFirstTimer() {
         if (initTimer != null) {
             initTimer.cancel();
             initTimer.purge();
